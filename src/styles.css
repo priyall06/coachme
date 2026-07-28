@@ -5,9 +5,8 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * CoachMe AI — Design System
- * Dark theme · Glassmorphism · Neon green accent · Soft glow
- * All colors in oklch. Semantic tokens only — never hardcode colors in components.
+ * CoachMe AI — Editorial Futurist Design System
+ * Paper & Ink · Brutalist grid · Display serif · High contrast
  */
 
 @theme inline {
@@ -27,7 +26,6 @@
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
-  --color-primary-glow: var(--primary-glow);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
@@ -39,8 +37,9 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --color-glass: var(--glass);
-  --color-glass-border: var(--glass-border);
+  --color-panel: var(--panel);
+  --color-panel-border: var(--panel-border);
+  --color-ink: var(--ink);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
@@ -48,66 +47,54 @@
   --color-chart-5: var(--chart-5);
 
   --font-sans: "Inter", "SF Pro Display", system-ui, sans-serif;
-  --font-display: "Space Grotesk", "Inter", sans-serif;
+  --font-display: "Fraunces", "Instrument Serif", "Times New Roman", serif;
   --font-serif: "Instrument Serif", "Times New Roman", serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
 }
 
-:root,
-.dark {
-  --radius: 0.875rem;
+:root {
+  --radius: 0.25rem;
 
-  /* Deep space background */
-  --background: oklch(0.16 0.02 240);
-  --foreground: oklch(0.97 0.01 150);
+  /* Paper & ink */
+  --background: oklch(0.94 0.005 90);   /* warm off-white */
+  --foreground: oklch(0.12 0 0);         /* near black */
+  --ink: oklch(0.08 0 0);
 
-  --card: oklch(0.20 0.02 240);
-  --card-foreground: oklch(0.97 0.01 150);
+  --card: oklch(0.97 0.003 90);
+  --card-foreground: oklch(0.12 0 0);
 
-  --popover: oklch(0.20 0.025 240);
-  --popover-foreground: oklch(0.97 0.01 150);
+  --popover: oklch(0.97 0.003 90);
+  --popover-foreground: oklch(0.12 0 0);
 
-  /* Neon green — primary accent */
-  --primary: oklch(0.88 0.24 145);
-  --primary-foreground: oklch(0.15 0.03 240);
-  --primary-glow: oklch(0.92 0.26 148);
+  --primary: oklch(0.08 0 0);            /* black on paper */
+  --primary-foreground: oklch(0.97 0.003 90);
 
-  --secondary: oklch(0.26 0.03 240);
-  --secondary-foreground: oklch(0.97 0.01 150);
+  --secondary: oklch(0.90 0.005 90);
+  --secondary-foreground: oklch(0.12 0 0);
 
-  --muted: oklch(0.24 0.02 240);
-  --muted-foreground: oklch(0.68 0.02 240);
+  --muted: oklch(0.90 0.005 90);
+  --muted-foreground: oklch(0.42 0 0);
 
-  --accent: oklch(0.32 0.08 165);
-  --accent-foreground: oklch(0.97 0.01 150);
+  --accent: oklch(0.88 0.005 90);
+  --accent-foreground: oklch(0.12 0 0);
 
-  --destructive: oklch(0.65 0.24 25);
-  --destructive-foreground: oklch(0.98 0.01 150);
+  --destructive: oklch(0.55 0.22 25);
+  --destructive-foreground: oklch(0.98 0 0);
 
-  --border: oklch(0.30 0.02 240 / 0.6);
-  --input: oklch(0.25 0.02 240);
-  --ring: oklch(0.88 0.24 145);
+  --border: oklch(0.12 0 0 / 0.85);
+  --input: oklch(0.90 0.005 90);
+  --ring: oklch(0.12 0 0);
 
-  /* Glass surfaces */
-  --glass: oklch(0.24 0.02 240 / 0.55);
-  --glass-border: oklch(0.88 0.24 145 / 0.18);
+  --panel: oklch(0.97 0.003 90);
+  --panel-border: oklch(0.12 0 0);
 
-  --chart-1: oklch(0.88 0.24 145);
-  --chart-2: oklch(0.72 0.19 200);
-  --chart-3: oklch(0.75 0.18 300);
-  --chart-4: oklch(0.80 0.20 60);
-  --chart-5: oklch(0.70 0.22 25);
+  --chart-1: oklch(0.12 0 0);
+  --chart-2: oklch(0.40 0 0);
+  --chart-3: oklch(0.60 0 0);
+  --chart-4: oklch(0.75 0 0);
+  --chart-5: oklch(0.85 0 0);
 
-  /* Gradients & shadows */
-  --gradient-primary: linear-gradient(135deg, oklch(0.88 0.24 145), oklch(0.72 0.19 200));
-  --gradient-hero: radial-gradient(ellipse at top, oklch(0.32 0.15 155 / 0.55), transparent 70%);
-  --gradient-glass: linear-gradient(135deg, oklch(1 0 0 / 0.06), oklch(1 0 0 / 0.02));
-
-  --shadow-glow: 0 0 40px oklch(0.88 0.24 145 / 0.35);
-  --shadow-glow-sm: 0 0 20px oklch(0.88 0.24 145 / 0.25);
-  --shadow-elegant: 0 20px 60px -20px oklch(0 0 0 / 0.6);
-
-  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-smooth: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @layer base {
@@ -116,7 +103,7 @@
   }
 
   html {
-    color-scheme: dark;
+    color-scheme: light;
   }
 
   body {
@@ -125,49 +112,49 @@
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     background-image:
-      radial-gradient(circle at 20% 10%, oklch(0.32 0.15 155 / 0.18), transparent 45%),
-      radial-gradient(circle at 85% 80%, oklch(0.32 0.15 200 / 0.15), transparent 45%);
-    background-attachment: fixed;
+      radial-gradient(oklch(0.12 0 0 / 0.06) 1px, transparent 1px);
+    background-size: 3px 3px;
     min-height: 100vh;
   }
 
   h1, h2, h3, h4 {
     font-family: var(--font-display);
-    letter-spacing: -0.02em;
+    letter-spacing: -0.03em;
+    font-weight: 500;
   }
 }
 
-@utility glass-card {
-  background: var(--glass);
-  backdrop-filter: blur(20px) saturate(140%);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-2xl);
-  box-shadow: var(--shadow-elegant);
+@utility panel {
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
 }
 
-@utility glow-primary {
-  box-shadow: var(--shadow-glow);
+@utility ink-block {
+  background: var(--ink);
+  color: var(--background);
 }
 
-@utility text-glow {
-  text-shadow: 0 0 24px oklch(0.88 0.24 145 / 0.55);
+@utility grain {
+  position: relative;
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: radial-gradient(oklch(0.12 0 0 / 0.08) 1px, transparent 1px);
+    background-size: 3px 3px;
+    mix-blend-mode: multiply;
+    opacity: 0.6;
+  }
 }
 
-@utility gradient-text {
-  background: var(--gradient-primary);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
 }
 
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-12px); }
-}
-
-@keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 20px oklch(0.88 0.24 145 / 0.3); }
-  50% { box-shadow: 0 0 40px oklch(0.88 0.24 145 / 0.6); }
+@utility animate-marquee {
+  animation: marquee 30s linear infinite;
 }
 
 @keyframes fade-up {
@@ -175,14 +162,6 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-@utility animate-float {
-  animation: float 6s ease-in-out infinite;
-}
-
-@utility animate-pulse-glow {
-  animation: pulse-glow 3s ease-in-out infinite;
-}
-
 @utility animate-fade-up {
-  animation: fade-up 0.6s cubic-bezier(0.4, 0, 0.2, 1) both;
+  animation: fade-up 0.7s cubic-bezier(0.4, 0, 0.2, 1) both;
 }
