@@ -17,6 +17,7 @@ import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authentic
 import { Route as AuthenticatedHabitsRouteImport } from './routes/_authenticated/habits'
 import { Route as AuthenticatedGoalsRouteImport } from './routes/_authenticated/goals'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedChatRouteImport } from './routes/_authenticated/chat'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -57,10 +58,16 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedChatRoute = AuthenticatedChatRouteImport.update({
+  id: '/chat',
+  path: '/chat',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/chat': typeof AuthenticatedChatRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/goals': typeof AuthenticatedGoalsRoute
   '/habits': typeof AuthenticatedHabitsRoute
@@ -70,6 +77,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/chat': typeof AuthenticatedChatRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/goals': typeof AuthenticatedGoalsRoute
   '/habits': typeof AuthenticatedHabitsRoute
@@ -81,6 +89,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_authenticated/chat': typeof AuthenticatedChatRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/goals': typeof AuthenticatedGoalsRoute
   '/_authenticated/habits': typeof AuthenticatedHabitsRoute
@@ -92,6 +101,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/chat'
     | '/dashboard'
     | '/goals'
     | '/habits'
@@ -101,6 +111,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/chat'
     | '/dashboard'
     | '/goals'
     | '/habits'
@@ -111,6 +122,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/_authenticated/chat'
     | '/_authenticated/dashboard'
     | '/_authenticated/goals'
     | '/_authenticated/habits'
@@ -182,10 +194,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/chat': {
+      id: '/_authenticated/chat'
+      path: '/chat'
+      fullPath: '/chat'
+      preLoaderRoute: typeof AuthenticatedChatRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedChatRoute: typeof AuthenticatedChatRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedGoalsRoute: typeof AuthenticatedGoalsRoute
   AuthenticatedHabitsRoute: typeof AuthenticatedHabitsRoute
@@ -194,6 +214,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedChatRoute: AuthenticatedChatRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedGoalsRoute: AuthenticatedGoalsRoute,
   AuthenticatedHabitsRoute: AuthenticatedHabitsRoute,
