@@ -1,8 +1,10 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { Plus, ArrowLeft, ArrowRight, Sparkle } from "lucide-react";
-import { motion } from "framer-motion";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { Plus, ArrowLeft, ArrowRight, Sparkle, X } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useState } from "react";
 import robotHero from "@/assets/robot-hero.png";
 import robotSide from "@/assets/robot-side.png";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -26,7 +28,95 @@ export const Route = createFileRoute("/")({
   component: Landing,
 });
 
+const MENU_LINKS = [
+  { to: "/dashboard", label: "Dashboard" },
+  { to: "/chat", label: "AI Coach" },
+  { to: "/goals", label: "Goals" },
+  { to: "/habits", label: "Habits" },
+  { to: "/planner", label: "Planner" },
+  { to: "/vision", label: "AI Vision" },
+  { to: "/reports", label: "Reports" },
+  { to: "/careers", label: "Career Matching" },
+  { to: "/archive", label: "Archive" },
+  { to: "/settings", label: "Settings" },
+  { to: "/profile", label: "Profile" },
+] as const;
+
+const SLIDES = [
+  {
+    n: "01",
+    title: "AI Coach",
+    caption: "Explore Adaptive AI Coaching",
+    to: "/chat",
+    body: "A conversational coach that knows your goals, habits and momentum, and answers in your preferred tone.",
+    features: ["Goal-aware context", "Session history", "Tone control"],
+  },
+  {
+    n: "02",
+    title: "Goal Tracking",
+    caption: "Track Every Goal End-to-End",
+    to: "/goals",
+    body: "Create, prioritise and progress goals across academics, career, fitness and personal growth.",
+    features: ["Full CRUD", "Priority & category", "Progress scoring"],
+  },
+  {
+    n: "03",
+    title: "AI Vision",
+    caption: "Upload. Analyse. Improve.",
+    to: "/vision",
+    body: "Send notes, whiteboards, meals or form checks and receive structured coaching feedback.",
+    features: ["Image analysis", "Actionable suggestions", "Saved reports"],
+  },
+  {
+    n: "04",
+    title: "Habit System",
+    caption: "Streaks That Compound",
+    to: "/habits",
+    body: "Daily check-ins with streak maths, mood capture and weekly consistency analytics.",
+    features: ["Streak engine", "Mood logging", "Consistency charts"],
+  },
+  {
+    n: "05",
+    title: "Reports",
+    caption: "Your Week, Reviewed",
+    to: "/reports",
+    body: "Weekly scores, trend lines and coach commentary generated from your real activity.",
+    features: ["Recharts trends", "AI commentary", "Recommendations"],
+  },
+] as const;
+
 function Landing() {
+  const navigate = useNavigate();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [slide, setSlide] = useState(0);
+  const [modal, setModal] = useState<null | "details" | "manifesto">(null);
+  const [authed, setAuthed] = useState(false);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => setAuthed(Boolean(data.session)));
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => setAuthed(Boolean(s)));
+    return () => sub.subscription.unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setMenuOpen(false);
+        setModal(null);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
+  const go = (to: string) => {
+    setMenuOpen(false);
+    setModal(null);
+    navigate({ to: authed ? to : "/auth" });
+  };
+  const startCoaching = () => go(authed ? "/dashboard" : "/onboarding");
+  const current = SLIDES[slide]!;
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Outer editorial frame */}
@@ -34,7 +124,10 @@ function Landing() {
         {/* ============ TOP NAV BAR (3 cols) ============ */}
         <div className="grid grid-cols-12 gap-2 md:gap-3">
           {/* menu block */}
-          <motion.div
+          <motion.button
+            type="button"
+            onClick={() => setMenuOpen(true)}
+            aria-label="Open menu"
             initial={{ opacity: 0, y: -12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
@@ -47,7 +140,7 @@ function Landing() {
               <span className="h-px w-6 bg-background" />
               <span className="h-px w-4 bg-background self-end" />
             </div>
-          </motion.div>
+          </motion.button>
 
           {/* logo */}
           <motion.div
@@ -56,10 +149,10 @@ function Landing() {
             transition={{ duration: 0.5, delay: 0.05 }}
             className="col-span-12 md:col-span-4 panel flex items-center justify-center py-4"
           >
-            <span className="font-display text-3xl italic tracking-tight">
+            <Link to="/" aria-label="CoachMe AI home" className="font-display text-3xl italic tracking-tight">
               C<span className="not-italic">m</span>
               <sup className="ml-0.5 text-xs">AI</sup>
-            </span>
+            </Link>
           </motion.div>
 
           {/* nav */}
@@ -118,7 +211,11 @@ function Landing() {
               className="panel flex-1 flex flex-col justify-between px-6 py-8 min-h-[280px]"
             >
               <div className="flex justify-end">
-                <button className="grid h-9 w-9 place-items-center border border-foreground/80 hover:bg-foreground hover:text-background transition">
+                <button
+                  onClick={() => setMenuOpen(true)}
+                  aria-label="Open module menu"
+                  className="grid h-9 w-9 place-items-center border border-foreground/80 hover:bg-foreground hover:text-background transition"
+                >
                   <Plus className="h-4 w-4" />
                 </button>
               </div>
@@ -130,7 +227,11 @@ function Landing() {
                 </h2>
               </div>
               <div className="flex items-end justify-between">
-                <button className="grid h-9 w-9 place-items-center border border-foreground/80 hover:bg-foreground hover:text-background transition">
+                <button
+                  onClick={startCoaching}
+                  aria-label="Start coaching"
+                  className="grid h-9 w-9 place-items-center border border-foreground/80 hover:bg-foreground hover:text-background transition"
+                >
                   <Plus className="h-4 w-4" />
                 </button>
                 <span className="font-mono text-[10px] tracking-[0.2em] text-muted-foreground">
@@ -171,13 +272,14 @@ function Landing() {
               ®CM · 2026
             </div>
             <div className="absolute right-6 top-6 font-mono text-[10px] tracking-[0.25em] text-foreground/70">
-              N°04
+              N°{current.n}
             </div>
 
             {/* view details circle */}
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              onClick={() => setModal("details")}
               className="absolute left-8 bottom-24 grid h-28 w-28 place-items-center rounded-full bg-foreground/85 text-background text-xs font-medium tracking-wide backdrop-blur-md"
             >
               View<br />Details
@@ -202,17 +304,29 @@ function Landing() {
               className="panel relative px-6 py-6 min-h-[340px]"
             >
               <div className="absolute left-4 top-1/2 -translate-y-1/2">
-                <button className="grid h-9 w-9 place-items-center rounded-full border border-foreground/80 hover:bg-foreground hover:text-background transition">
+                <button
+                  onClick={() => setSlide((s) => (s - 1 + SLIDES.length) % SLIDES.length)}
+                  aria-label="Previous module"
+                  className="grid h-9 w-9 place-items-center rounded-full border border-foreground/80 hover:bg-foreground hover:text-background transition"
+                >
                   <ArrowLeft className="h-4 w-4" />
                 </button>
               </div>
               <div className="absolute right-4 top-1/2 -translate-y-1/2">
-                <button className="grid h-9 w-9 place-items-center rounded-full border border-foreground/80 hover:bg-foreground hover:text-background transition">
+                <button
+                  onClick={() => setSlide((s) => (s + 1) % SLIDES.length)}
+                  aria-label="Next module"
+                  className="grid h-9 w-9 place-items-center rounded-full border border-foreground/80 hover:bg-foreground hover:text-background transition"
+                >
                   <ArrowRight className="h-4 w-4" />
                 </button>
               </div>
               <div className="relative flex justify-center">
-                <div className="relative">
+                <button
+                  onClick={() => go(current.to)}
+                  aria-label={`Open ${current.title}`}
+                  className="relative"
+                >
                   <div className="absolute -top-2 left-1/2 -translate-x-1/2 h-24 w-24 rounded-full bg-foreground/10" />
                   <img
                     src={robotSide}
@@ -222,27 +336,41 @@ function Landing() {
                     loading="lazy"
                     className="relative h-56 w-auto object-contain mix-blend-multiply"
                   />
-                </div>
+                </button>
               </div>
-              <p className="mt-4 text-center font-display text-lg italic">
-                Explore Adaptive AI Coaching
-              </p>
+              <AnimatePresence mode="wait">
+                <motion.p
+                  key={current.caption}
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -6 }}
+                  transition={{ duration: 0.25 }}
+                  className="mt-4 text-center font-display text-lg italic"
+                >
+                  {current.caption}
+                </motion.p>
+              </AnimatePresence>
             </motion.div>
 
-            {/* sparkle divider */}
+            {/* sparkle divider — carousel indicators */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4 }}
               className="panel flex items-center justify-center gap-4 px-6 py-4"
             >
-              {[0, 1, 2].map((i) => (
-                <span
-                  key={i}
-                  className="grid h-9 w-9 place-items-center rounded-full border border-foreground/80"
+              {SLIDES.map((s, i) => (
+                <button
+                  key={s.n}
+                  onClick={() => setSlide(i)}
+                  aria-label={`Show ${s.title}`}
+                  aria-current={i === slide}
+                  className={`grid h-9 w-9 place-items-center rounded-full border border-foreground/80 transition ${
+                    i === slide ? "bg-foreground text-background" : ""
+                  }`}
                 >
                   <Sparkle className="h-3.5 w-3.5" fill="currentColor" />
-                </span>
+                </button>
               ))}
             </motion.div>
 
@@ -263,13 +391,16 @@ function Landing() {
                 generation of personal growth — across academics, career,
                 fitness and sports.
               </p>
-              <div className="mt-6 flex items-center justify-between">
+              <button
+                onClick={startCoaching}
+                className="mt-6 flex w-full items-center justify-between"
+              >
                 <span className="font-mono text-[10px] tracking-[0.25em] text-muted-foreground">
                   ↗ START COACHING
                 </span>
                 <span className="h-px flex-1 mx-4 bg-foreground/30" />
                 <Plus className="h-4 w-4" />
-              </div>
+              </button>
             </motion.div>
           </div>
         </div>
@@ -316,22 +447,24 @@ function Landing() {
             </h2>
           </div>
           {[
-            { n: "01", t: "Adaptive Coaching", d: "AI that learns your style, pace and preferences over time." },
-            { n: "02", t: "Goal Management", d: "Break down and prioritize with generated action plans." },
-            { n: "03", t: "Daily Planner", d: "Adaptive scheduling that respects your routine." },
-            { n: "04", t: "Habit Streaks", d: "Track completion, mood and momentum with analytics." },
-            { n: "05", t: "AI Vision", d: "Upload notes or form checks — get instant feedback." },
-            { n: "06", t: "Weekly Reports", d: "Charts, scores and coach commentary every Sunday." },
-            { n: "07", t: "Conversational Coach", d: "Chat any time — study, career, motivation." },
-            { n: "08", t: "Opportunity Matching", d: "Curated courses, scholarships and internships." },
+            { n: "01", t: "Adaptive Coaching", d: "AI that learns your style, pace and preferences over time.", to: "/coaching" },
+            { n: "02", t: "Goal Management", d: "Break down and prioritize with generated action plans.", to: "/goals" },
+            { n: "03", t: "Daily Planner", d: "Adaptive scheduling that respects your routine.", to: "/planner" },
+            { n: "04", t: "Habit Streaks", d: "Track completion, mood and momentum with analytics.", to: "/habits" },
+            { n: "05", t: "AI Vision", d: "Upload notes or form checks — get instant feedback.", to: "/vision" },
+            { n: "06", t: "Weekly Reports", d: "Charts, scores and coach commentary every Sunday.", to: "/reports" },
+            { n: "07", t: "Conversational Coach", d: "Chat any time — study, career, motivation.", to: "/chat" },
+            { n: "08", t: "Opportunity Matching", d: "Curated courses, scholarships and internships.", to: "/careers" },
           ].map((m, i) => (
-            <motion.div
+            <motion.button
               key={m.n}
+              type="button"
+              onClick={() => go(m.to)}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: i * 0.04 }}
-              className="col-span-6 md:col-span-2 panel group relative px-5 py-6 min-h-[180px] flex flex-col justify-between hover:bg-foreground hover:text-background transition-colors"
+              className="col-span-6 md:col-span-2 panel group relative px-5 py-6 min-h-[180px] flex flex-col justify-between text-left hover:bg-foreground hover:text-background transition-colors"
             >
               <span className="font-mono text-[10px] tracking-[0.3em] opacity-70">
                 N°{m.n}
@@ -341,7 +474,7 @@ function Landing() {
                 <p className="mt-2 text-[11px] leading-relaxed opacity-70">{m.d}</p>
               </div>
               <Plus className="h-3.5 w-3.5 self-end" />
-            </motion.div>
+            </motion.button>
           ))}
         </section>
 
@@ -356,15 +489,25 @@ function Landing() {
               <span className="italic">The future is patient.</span>
             </h2>
             <div className="mt-10 flex flex-wrap items-center gap-4">
-              <button className="rounded-full bg-background px-7 py-3.5 font-mono text-xs uppercase tracking-[0.25em] text-foreground hover:bg-background/90 transition">
+              <button
+                onClick={startCoaching}
+                className="rounded-full bg-background px-7 py-3.5 font-mono text-xs uppercase tracking-[0.25em] text-foreground hover:bg-background/90 transition"
+              >
                 Start coaching →
               </button>
-              <button className="rounded-full border border-background/60 px-7 py-3.5 font-mono text-xs uppercase tracking-[0.25em] hover:bg-background hover:text-foreground transition">
+              <button
+                onClick={() => setModal("manifesto")}
+                className="rounded-full border border-background/60 px-7 py-3.5 font-mono text-xs uppercase tracking-[0.25em] hover:bg-background hover:text-foreground transition"
+              >
                 Read manifesto
               </button>
             </div>
           </div>
-          <div id="collection" className="col-span-12 md:col-span-4 panel flex flex-col justify-between px-6 py-8">
+          <button
+            id="collection"
+            onClick={() => go("/archive")}
+            className="col-span-12 md:col-span-4 panel flex flex-col justify-between px-6 py-8 text-left transition hover:bg-foreground hover:text-background"
+          >
             <div>
               <p className="font-mono text-[10px] tracking-[0.3em] text-muted-foreground">
                 §03 — COLLECTION
@@ -376,11 +519,139 @@ function Landing() {
             </div>
             <div className="mt-8 flex items-center justify-between text-[11px] font-mono tracking-[0.2em] text-muted-foreground uppercase">
               <span>© 2026 CoachMe AI</span>
-              <span>ALL RIGHTS RESERVED</span>
+              <span>OPEN ARCHIVE →</span>
             </div>
-          </div>
+          </button>
         </section>
       </div>
+
+      {/* ============ MENU DRAWER ============ */}
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-foreground text-background"
+          >
+            <div className="mx-auto flex h-full max-w-[1400px] flex-col px-4 py-6 md:px-8">
+              <div className="flex items-center justify-between">
+                <span className="font-mono text-xs tracking-[0.3em]">MENU</span>
+                <button onClick={() => setMenuOpen(false)} aria-label="Close menu">
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+              <nav className="mt-10 flex-1 overflow-y-auto">
+                {MENU_LINKS.map((l, i) => (
+                  <motion.button
+                    key={l.to}
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.03 * i }}
+                    onClick={() => go(l.to)}
+                    className="block w-full border-b border-background/20 py-3 text-left font-display text-3xl leading-tight hover:italic md:text-4xl"
+                  >
+                    {l.label}
+                  </motion.button>
+                ))}
+                <motion.button
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.03 * MENU_LINKS.length }}
+                  onClick={async () => {
+                    await supabase.auth.signOut();
+                    setMenuOpen(false);
+                    navigate({ to: "/auth" });
+                  }}
+                  className="block w-full py-4 text-left font-mono text-[11px] uppercase tracking-[0.3em] opacity-70"
+                >
+                  {authed ? "Logout" : "Sign in"}
+                </motion.button>
+              </nav>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ============ MODALS ============ */}
+      <AnimatePresence>
+        {modal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setModal(null)}
+            className="fixed inset-0 z-50 grid place-items-center bg-foreground/40 px-4 backdrop-blur-sm"
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 20, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 10 }}
+              onClick={(e) => e.stopPropagation()}
+              className="panel relative max-h-[80vh] w-full max-w-xl overflow-y-auto px-7 py-8"
+            >
+              <button
+                onClick={() => setModal(null)}
+                aria-label="Close"
+                className="absolute right-5 top-5"
+              >
+                <X className="h-4 w-4" />
+              </button>
+              {modal === "details" ? (
+                <>
+                  <p className="font-mono text-[10px] tracking-[0.3em] text-muted-foreground">
+                    N°{current.n} — OVERVIEW
+                  </p>
+                  <h3 className="mt-4 font-display text-4xl leading-[1.05]">{current.title}</h3>
+                  <p className="mt-4 text-[13px] leading-relaxed text-muted-foreground">
+                    {current.body}
+                  </p>
+                  <ul className="mt-6 space-y-2 text-[13px]">
+                    {current.features.map((f) => (
+                      <li key={f} className="border-b border-foreground/15 pb-2">— {f}</li>
+                    ))}
+                  </ul>
+                  <button
+                    onClick={() => go(current.to)}
+                    className="ink-block mt-7 px-6 py-3 font-mono text-[10px] uppercase tracking-[0.25em]"
+                  >
+                    Open module →
+                  </button>
+                </>
+              ) : (
+                <>
+                  <p className="font-mono text-[10px] tracking-[0.3em] text-muted-foreground">
+                    §02 — MANIFESTO
+                  </p>
+                  <h3 className="mt-4 font-display text-4xl leading-[1.05]">
+                    The future is <span className="italic">patient</span>.
+                  </h3>
+                  <div className="mt-5 space-y-4 text-[13px] leading-relaxed text-muted-foreground">
+                    <p>
+                      Growth is not a sprint of motivation — it is a system of small,
+                      repeated decisions. CoachMe AI exists to hold that system for you.
+                    </p>
+                    <p>
+                      We believe coaching should adapt to the person, not the other way
+                      round: your pace, your tone, your constraints, your season of life.
+                    </p>
+                    <p>
+                      Every goal you set, habit you log and session you hold is archived and
+                      yours. The coach reads the record, not a stereotype.
+                    </p>
+                  </div>
+                  <button
+                    onClick={startCoaching}
+                    className="ink-block mt-7 px-6 py-3 font-mono text-[10px] uppercase tracking-[0.25em]"
+                  >
+                    Start coaching →
+                  </button>
+                </>
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
